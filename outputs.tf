@@ -1,0 +1,20 @@
+output "dynamodb_table_name" {
+  value = aws_dynamodb_table.keys.name
+}
+
+output "dynamodb_table_arn" {
+  value = aws_dynamodb_table.keys.arn
+}
+
+output "iam_user_name" {
+  value = aws_iam_user.app.name
+}
+
+output "access_key_id" {
+  value = aws_iam_access_key.app.id
+}
+
+output "secret_access_key" {
+  value     = aws_iam_access_key.app.secret
+  sensitive = true
+}
