@@ -18,3 +18,7 @@ output "secret_access_key" {
   value     = aws_iam_access_key.app.secret
   sensitive = true
 }
+
+output "github_actions_role_arn" {
+  value = aws_iam_role.github_actions.arn
+}
