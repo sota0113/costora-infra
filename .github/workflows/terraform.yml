@@ -13,7 +13,7 @@ permissions:
 
 env:
   AWS_REGION: ap-northeast-1
-  TF_VERSION: "1.9.0"
+  TF_VERSION: "1.11.4"
 
 jobs:
   validate:
@@ -54,7 +54,7 @@ jobs:
 
       - name: terraform plan
         id: plan
-        run: terraform plan -no-color -out=tfplan
+        run: terraform plan -no-color
         continue-on-error: true
 
       - name: Post plan to PR
