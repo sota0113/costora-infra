@@ -22,3 +22,12 @@ output "secret_access_key" {
 output "github_actions_role_arn" {
   value = aws_iam_role.github_actions.arn
 }
+
+output "invoice_access_key_id" {
+  value = aws_iam_access_key.invoice.id
+}
+
+output "invoice_secret_access_key" {
+  value     = aws_iam_access_key.invoice.secret
+  sensitive = true
+}
