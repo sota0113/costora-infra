@@ -50,6 +50,7 @@ resource "aws_iam_role_policy" "github_actions_terraform" {
           "dynamodb:UntagResource",
           "dynamodb:ListTagsOfResource",
           "dynamodb:DescribeContinuousBackups",
+          "dynamodb:DescribeTimeToLive",
         ]
         Resource = "arn:aws:dynamodb:*:*:table/${var.project}-*"
       },
