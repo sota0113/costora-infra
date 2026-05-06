@@ -60,15 +60,34 @@ resource "aws_iam_user_policy" "dynamodb" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Action = [
-        "dynamodb:GetItem",
-        "dynamodb:PutItem",
-        "dynamodb:DeleteItem",
-      ]
-      Resource = aws_dynamodb_table.keys.arn
-    }]
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem",
+        ]
+        Resource = aws_dynamodb_table.keys.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:DeleteObject",
+        ]
+        Resource = "arn:aws:s3:::${var.project}-invoice/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "textract:StartDocumentAnalysis",
+          "textract:GetDocumentAnalysis",
+          "textract:DetectDocumentText",
+        ]
+        Resource = "*"
+      },
+    ]
   })
 }
 
