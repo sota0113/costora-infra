@@ -38,78 +38,11 @@ resource "aws_iam_role_policy" "github_actions_terraform" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "dynamodb:CreateTable",
-          "dynamodb:DeleteTable",
-          "dynamodb:UpdateTable",
-          "dynamodb:TagResource",
-          "dynamodb:UntagResource",
-          "dynamodb:Describe*",
-          "dynamodb:List*",
-        ]
-        Resource = "arn:aws:dynamodb:*:*:table/${var.project}-*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-        ]
-        Resource = [
-          "arn:aws:s3:::costora-tfstate-143985718717-ap-northeast-1-an/*",
-          "arn:aws:s3:::${var.project}-invoice/*",
-        ]
-      },
-      {
-        Effect = "Allow"
-        Action = ["s3:ListBucket"]
-        Resource = [
-          "arn:aws:s3:::costora-tfstate-143985718717-ap-northeast-1-an",
-          "arn:aws:s3:::${var.project}-invoice",
-        ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:CreateBucket",
-          "s3:DeleteBucket",
-          "s3:GetBucketPublicAccessBlock",
-          "s3:PutBucketPublicAccessBlock",
-          "s3:GetBucketTagging",
-          "s3:PutBucketTagging",
-          "s3:GetBucketVersioning",
-          "s3:GetBucketObjectLockConfiguration",
-          "s3:GetBucketRequestPayment",
-          "s3:GetBucketWebsite",
-          "s3:GetBucketLogging",
-          "s3:GetAccelerateConfiguration",
-          "s3:GetBucketCORS",
-          "s3:GetLifecycleConfiguration",
-          "s3:PutLifecycleConfiguration",
-          "s3:GetReplicationConfiguration",
-          "s3:GetEncryptionConfiguration",
-        ]
-        Resource = "arn:aws:s3:::${var.project}-invoice"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "iam:Create*",
-          "iam:Delete*",
-          "iam:Get*",
-          "iam:List*",
-          "iam:Put*",
-          "iam:Tag*",
-          "iam:Untag*",
-          "iam:PassRole",
-        ]
-        Resource = "*"
-      },
-    ]
+    Statement = [{
+      Effect   = "Allow"
+      Action   = "*"
+      Resource = "*"
+    }]
   })
 }
 
