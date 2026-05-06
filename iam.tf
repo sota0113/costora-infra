@@ -92,7 +92,11 @@ resource "aws_iam_role_policy" "github_actions_terraform" {
           "iam:PutRolePolicy",
           "iam:DeleteRolePolicy",
           "iam:GetRolePolicy",
+          "iam:ListRolePolicies",
+          "iam:ListAttachedRolePolicies",
           "iam:PassRole",
+          "iam:ListUserPolicies",
+          "iam:ListAttachedUserPolicies",
         ]
         Resource = "*"
       },
