@@ -54,8 +54,8 @@ resource "aws_iam_user" "app" {
   }
 }
 
-resource "aws_iam_user_policy" "dynamodb" {
-  name = "${var.project}-dynamodb-access"
+resource "aws_iam_user_policy" "app" {
+  name = "${var.project}-app-access"
   user = aws_iam_user.app.name
 
   policy = jsonencode({
