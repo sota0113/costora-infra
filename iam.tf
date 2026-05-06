@@ -55,6 +55,20 @@ resource "aws_iam_role_policy" "github_actions_terraform" {
       {
         Effect = "Allow"
         Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+        ]
+        Resource = "arn:aws:s3:::costora-tfstate-143985718717-ap-northeast-1-an/*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["s3:ListBucket"]
+        Resource = "arn:aws:s3:::costora-tfstate-143985718717-ap-northeast-1-an"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "iam:CreateUser",
           "iam:DeleteUser",
           "iam:GetUser",
