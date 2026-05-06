@@ -59,12 +59,40 @@ resource "aws_iam_role_policy" "github_actions_terraform" {
           "s3:PutObject",
           "s3:DeleteObject",
         ]
-        Resource = "arn:aws:s3:::costora-tfstate-143985718717-ap-northeast-1-an/*"
+        Resource = [
+          "arn:aws:s3:::costora-tfstate-143985718717-ap-northeast-1-an/*",
+          "arn:aws:s3:::${var.project}-invoice/*",
+        ]
       },
       {
-        Effect   = "Allow"
-        Action   = ["s3:ListBucket"]
-        Resource = "arn:aws:s3:::costora-tfstate-143985718717-ap-northeast-1-an"
+        Effect = "Allow"
+        Action = ["s3:ListBucket"]
+        Resource = [
+          "arn:aws:s3:::costora-tfstate-143985718717-ap-northeast-1-an",
+          "arn:aws:s3:::${var.project}-invoice",
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:CreateBucket",
+          "s3:DeleteBucket",
+          "s3:GetBucketPublicAccessBlock",
+          "s3:PutBucketPublicAccessBlock",
+          "s3:GetBucketTagging",
+          "s3:PutBucketTagging",
+          "s3:GetBucketVersioning",
+          "s3:GetBucketObjectLockConfiguration",
+          "s3:GetBucketRequestPayment",
+          "s3:GetBucketWebsite",
+          "s3:GetBucketLogging",
+          "s3:GetAccelerateConfiguration",
+          "s3:GetBucketCORS",
+          "s3:GetLifecycleConfiguration",
+          "s3:GetReplicationConfiguration",
+          "s3:GetEncryptionConfiguration",
+        ]
+        Resource = "arn:aws:s3:::${var.project}-invoice"
       },
       {
         Effect = "Allow"

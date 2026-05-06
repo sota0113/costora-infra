@@ -31,3 +31,7 @@ output "invoice_secret_access_key" {
   value     = aws_iam_access_key.invoice.secret
   sensitive = true
 }
+
+output "invoice_s3_bucket" {
+  value = aws_s3_bucket.invoice.bucket
+}
