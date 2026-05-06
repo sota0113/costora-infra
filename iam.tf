@@ -87,6 +87,11 @@ resource "aws_iam_user_policy" "dynamodb" {
         ]
         Resource = "*"
       },
+      {
+        Effect   = "Allow"
+        Action   = ["bedrock:InvokeModel"]
+        Resource = "arn:aws:bedrock:*::foundation-model/*"
+      },
     ]
   })
 }
