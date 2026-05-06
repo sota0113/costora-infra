@@ -89,6 +89,7 @@ resource "aws_iam_role_policy" "github_actions_terraform" {
           "s3:GetAccelerateConfiguration",
           "s3:GetBucketCORS",
           "s3:GetLifecycleConfiguration",
+          "s3:PutLifecycleConfiguration",
           "s3:GetReplicationConfiguration",
           "s3:GetEncryptionConfiguration",
         ]

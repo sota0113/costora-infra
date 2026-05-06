@@ -14,3 +14,16 @@ resource "aws_s3_bucket_public_access_block" "invoice" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket_lifecycle_configuration" "invoice" {
+  bucket = aws_s3_bucket.invoice.id
+
+  rule {
+    id     = "expire-after-14-days"
+    status = "Enabled"
+
+    expiration {
+      days = 14
+    }
+  }
+}
