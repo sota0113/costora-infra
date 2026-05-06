@@ -3,8 +3,14 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 5.81"
     }
+  }
+
+  backend "s3" {
+    bucket = "costora-tfstate-143985718717-ap-northeast-1-an"
+    key    = "terraform.tfstate"
+    region = "ap-northeast-1"
   }
 }
 
