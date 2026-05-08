@@ -80,17 +80,11 @@ resource "aws_iam_user_policy" "app" {
       },
       {
         Effect = "Allow"
-        Action = [
-          "textract:StartDocumentAnalysis",
-          "textract:GetDocumentAnalysis",
-          "textract:DetectDocumentText",
+        Action = ["bedrock:InvokeModel"]
+        Resource = [
+          "arn:aws:bedrock:*::foundation-model/*",
+          "arn:aws:bedrock:*:*:inference-profile/*",
         ]
-        Resource = "*"
-      },
-      {
-        Effect   = "Allow"
-        Action   = ["bedrock:InvokeModel"]
-        Resource = "arn:aws:bedrock:*::foundation-model/*"
       },
     ]
   })
