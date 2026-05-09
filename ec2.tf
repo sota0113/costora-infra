@@ -13,6 +13,33 @@ data "aws_ami" "deep_learning" {
   }
 }
 
+resource "aws_iam_role" "ollama" {
+  name = "${var.project}-ollama"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+
+  tags = {
+    Project = var.project
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "ollama_ssm" {
+  role       = aws_iam_role.ollama.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "ollama" {
+  name = "${var.project}-ollama"
+  role = aws_iam_role.ollama.name
+}
+
 resource "aws_security_group" "ollama" {
   name        = "${var.project}-ollama"
   description = "Ollama inference server"
@@ -21,14 +48,6 @@ resource "aws_security_group" "ollama" {
     description = "Ollama API"
     from_port   = 11434
     to_port     = 11434
-    protocol    = "tcp"
-    cidr_blocks = var.ollama_allowed_cidrs
-  }
-
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = var.ollama_allowed_cidrs
   }
@@ -51,7 +70,7 @@ resource "aws_spot_instance_request" "ollama" {
   spot_type                      = "persistent"
   instance_interruption_behavior = "stop"
   wait_for_fulfillment           = true
-  key_name                       = var.ollama_key_name
+  iam_instance_profile           = aws_iam_instance_profile.ollama.name
   vpc_security_group_ids         = [aws_security_group.ollama.id]
 
   root_block_device {
@@ -86,3 +105,4 @@ resource "aws_eip_association" "ollama" {
   instance_id   = aws_spot_instance_request.ollama.spot_instance_id
   allocation_id = aws_eip.ollama.id
 }
+
