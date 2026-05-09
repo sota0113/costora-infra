@@ -26,3 +26,7 @@ output "github_actions_role_arn" {
 output "invoice_s3_bucket" {
   value = aws_s3_bucket.invoice.bucket
 }
+
+output "ollama_endpoint" {
+  value = "http://${aws_eip.ollama.public_ip}:11434"
+}
