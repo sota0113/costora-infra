@@ -30,3 +30,12 @@ output "invoice_s3_bucket" {
 output "ollama_endpoint" {
   value = "http://${aws_eip.ollama.public_ip}:11434"
 }
+
+output "inference_endpoint" {
+  value = "https://inference.patrae.net"
+}
+
+output "route53_name_servers" {
+  description = "Set these 4 NS records in Squarespace to complete domain migration"
+  value       = aws_route53_zone.patrae.name_servers
+}

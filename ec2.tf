@@ -35,6 +35,25 @@ resource "aws_iam_role_policy_attachment" "ollama_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+resource "aws_iam_role_policy" "ollama_route53" {
+  name = "${var.project}-ollama-route53"
+  role = aws_iam_role.ollama.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "route53:GetChange",
+        "route53:ChangeResourceRecordSets",
+        "route53:ListHostedZones",
+        "route53:ListResourceRecordSets",
+      ]
+      Resource = "*"
+    }]
+  })
+}
+
 resource "aws_iam_instance_profile" "ollama" {
   name = "${var.project}-ollama"
   role = aws_iam_role.ollama.name
@@ -43,6 +62,22 @@ resource "aws_iam_instance_profile" "ollama" {
 resource "aws_security_group" "ollama" {
   name        = "${var.project}-ollama"
   description = "Ollama inference server"
+
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   ingress {
     description = "Ollama API"
@@ -78,14 +113,11 @@ resource "aws_spot_instance_request" "ollama" {
     volume_type = "gp3"
   }
 
-  user_data = <<-EOF
-    #!/bin/bash
-    curl -fsSL https://ollama.com/install.sh | sh
-    systemctl enable ollama
-    systemctl start ollama
-    sleep 15
-    ollama pull llama3.1:8b
-  EOF
+  user_data = templatefile("${path.module}/scripts/userdata.sh", {
+    inference_api_b64 = base64encode(file("${path.module}/scripts/inference_api.py"))
+    nginx_http_b64    = base64encode(file("${path.module}/scripts/nginx_http.conf"))
+    setup_tls_b64     = base64encode(file("${path.module}/scripts/setup_tls.sh"))
+  })
 
   tags = {
     Project = var.project
@@ -105,4 +137,3 @@ resource "aws_eip_association" "ollama" {
   instance_id   = aws_spot_instance_request.ollama.spot_instance_id
   allocation_id = aws_eip.ollama.id
 }
-
