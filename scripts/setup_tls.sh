@@ -16,7 +16,7 @@ cat > /etc/nginx/conf.d/inference.conf << 'NGINXEOF'
 server {
     listen 80;
     server_name inference.patrae.net;
-    return 301 https://$server_name$request_uri;
+    return 301 https://$$server_name$$request_uri;
 }
 
 server {
@@ -26,11 +26,15 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/inference.patrae.net/privkey.pem;
     client_max_body_size 50M;
 
+    if ($$http_x_api_key != "${inference_api_key}") {
+        return 401;
+    }
+
     location / {
         proxy_pass         http://127.0.0.1:8000;
-        proxy_set_header   Host $host;
-        proxy_set_header   X-Real-IP $remote_addr;
-        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header   Host $$host;
+        proxy_set_header   X-Real-IP $$remote_addr;
+        proxy_set_header   X-Forwarded-For $$proxy_add_x_forwarded_for;
         proxy_read_timeout 600s;
     }
 }

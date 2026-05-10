@@ -46,10 +46,25 @@ UNIT
 systemctl enable inference
 systemctl start inference
 
-# ── nginx (HTTP only initially) ──────────────────────────────────────
-base64 -d > /etc/nginx/conf.d/inference.conf << 'B64EOF'
-${nginx_http_b64}
-B64EOF
+# ── nginx (HTTP only with API key auth) ──────────────────────────────
+cat > /etc/nginx/conf.d/inference.conf << 'NGINXEOF'
+server {
+    listen 80;
+    server_name inference.patrae.net;
+    client_max_body_size 50M;
+
+    if ($$http_x_api_key != "${inference_api_key}") {
+        return 401;
+    }
+
+    location / {
+        proxy_pass         http://127.0.0.1:8000;
+        proxy_set_header   Host $$host;
+        proxy_set_header   X-Real-IP $$remote_addr;
+        proxy_read_timeout 600s;
+    }
+}
+NGINXEOF
 
 systemctl enable nginx
 systemctl start nginx

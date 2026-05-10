@@ -115,8 +115,10 @@ resource "aws_spot_instance_request" "ollama" {
 
   user_data = templatefile("${path.module}/scripts/userdata.sh", {
     inference_api_b64 = base64encode(file("${path.module}/scripts/inference_api.py"))
-    nginx_http_b64    = base64encode(file("${path.module}/scripts/nginx_http.conf"))
-    setup_tls_b64     = base64encode(file("${path.module}/scripts/setup_tls.sh"))
+    setup_tls_b64 = base64encode(templatefile("${path.module}/scripts/setup_tls.sh", {
+      inference_api_key = var.inference_api_key
+    }))
+    inference_api_key = var.inference_api_key
   })
 
   tags = {

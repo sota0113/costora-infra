@@ -11,3 +11,9 @@ variable "ollama_allowed_cidrs" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
+
+variable "inference_api_key" {
+  description = "Secret key for nginx API authentication (X-Api-Key header)"
+  type        = string
+  sensitive   = true
+}
