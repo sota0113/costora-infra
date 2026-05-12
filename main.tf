@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.81"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
   }
 
   backend "s3" {
@@ -16,4 +20,9 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
+}
+
+resource "random_password" "inference_api_key" {
+  length  = 40
+  special = false
 }

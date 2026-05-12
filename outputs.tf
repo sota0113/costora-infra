@@ -39,3 +39,9 @@ output "route53_name_servers" {
   description = "Set these 4 NS records in Squarespace to complete domain migration"
   value       = aws_route53_zone.patrae.name_servers
 }
+
+output "inference_api_key" {
+  description = "Set as INFERENCE_API_KEY in Vercel environment variables"
+  value       = random_password.inference_api_key.result
+  sensitive   = true
+}
