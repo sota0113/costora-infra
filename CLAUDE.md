@@ -2,6 +2,18 @@
 
 Terraform で管理する AWS インフラ。ap-northeast-1 (東京) リージョン。
 
+## 主要な意思決定
+
+詳細は `docs/adr/` を参照。変更時は関連ADRを確認・更新すること。
+
+| 決定 | 結論 | ADR |
+|---|---|---|
+| LLM基盤 | Ollama llama3.1:8b（Bedrock利用不可） | [ADR 001](docs/adr/001-ollama-over-bedrock.md) |
+| EC2構成 | nginx/FastAPI/Ollama を1台に同居（コスト優先） | [ADR 002](docs/adr/002-single-ec2-colocation.md) |
+| DNS管理 | Route53（Terraform統合・certbot自動化） | [ADR 003](docs/adr/003-route53-dns-management.md) |
+| EC2アクセス | SSM Session Manager（SSH不要） | [ADR 004](docs/adr/004-ssm-over-ssh.md) |
+| インスタンス種別 | オンデマンド（スポットクォータが0のため） | [ADR 005](docs/adr/005-ondemand-over-spot.md) |
+
 ## アーキテクチャ概要
 
 ```
@@ -9,7 +21,7 @@ Vercel (Next.js)
     ↓ HTTPS / X-Api-Key ヘッダー
 inference.patrae.net (Route53 A → EIP)
     ↓
-EC2 g4dn.xlarge スポットインスタンス
+EC2 g4dn.xlarge オンデマンドインスタンス
     ├── nginx :443        ← TLS終端 + APIキー認証
     ├── FastAPI :8000     ← PDF解析 + Ollama呼び出し
     └── Ollama :11434     ← llama3.1:8b 推論
@@ -19,7 +31,7 @@ EC2 g4dn.xlarge スポットインスタンス
 
 | リソース | 用途 |
 |---|---|
-| `aws_spot_instance_request.ollama` | 推論サーバー (g4dn.xlarge) |
+| `aws_instance.ollama` | 推論サーバー (g4dn.xlarge) |
 | `aws_eip.ollama` | 固定パブリックIP |
 | `aws_route53_zone.patrae` | patrae.net DNS管理 |
 | `aws_route53_record.inference` | inference.patrae.net → EIP |
@@ -49,7 +61,7 @@ terraform apply
 2. **TLS設定**（DNS伝播後）
    自動で実行される。失敗した場合はSSM経由で実行:
    ```bash
-   aws ssm start-session --target <instance-id>
+   aws ssm start-session --target $(terraform output -raw ollama_instance_id)
    sudo /opt/setup-tls.sh
    ```
 
@@ -81,5 +93,4 @@ SSH不要。ポート22は開放していない。
 ## 注意点
 
 - `inference_api_key` は State に保存される。ローテーションは `terraform apply -replace="random_password.inference_api_key"`
-- スポットインスタンスは `stop` 動作のため、中断後も EBS（証明書含む）は保持される
 - `ollama pull llama3.1:8b` は起動時に実行されるため、初回起動は10〜15分程度かかる
