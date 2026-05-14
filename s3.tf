@@ -19,8 +19,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "invoice" {
   bucket = aws_s3_bucket.invoice.id
 
   rule {
-    id     = "expire-after-14-days"
+    id     = "expire-tmp-after-14-days"
     status = "Enabled"
+
+    filter {
+      prefix = "tmp/"
+    }
 
     expiration {
       days = 14
