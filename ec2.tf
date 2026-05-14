@@ -1,10 +1,10 @@
-data "aws_ami" "amazon_linux_2023" {
+data "aws_ami" "deep_learning" {
   most_recent = true
   owners      = ["amazon"]
 
   filter {
     name   = "name"
-    values = ["al2023-ami-2023.*-x86_64"]
+    values = ["Deep Learning OSS Nvidia Driver AMI GPU * (Amazon Linux 2023) *"]
   }
 
   filter {
@@ -92,8 +92,8 @@ resource "aws_security_group" "ollama" {
 }
 
 resource "aws_instance" "ollama" {
-  ami                    = data.aws_ami.amazon_linux_2023.id
-  instance_type          = "m5.xlarge"
+  ami                    = data.aws_ami.deep_learning.id
+  instance_type          = "g4dn.xlarge"
   iam_instance_profile   = aws_iam_instance_profile.ollama.name
   vpc_security_group_ids = [aws_security_group.ollama.id]
 
