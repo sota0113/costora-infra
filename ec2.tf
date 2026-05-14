@@ -91,14 +91,11 @@ resource "aws_security_group" "ollama" {
   }
 }
 
-resource "aws_spot_instance_request" "ollama" {
-  ami                            = data.aws_ami.deep_learning.id
-  instance_type                  = "g4dn.xlarge"
-  spot_type                      = "persistent"
-  instance_interruption_behavior = "stop"
-  wait_for_fulfillment           = true
-  iam_instance_profile           = aws_iam_instance_profile.ollama.name
-  vpc_security_group_ids         = [aws_security_group.ollama.id]
+resource "aws_instance" "ollama" {
+  ami                    = data.aws_ami.deep_learning.id
+  instance_type          = "g4dn.xlarge"
+  iam_instance_profile   = aws_iam_instance_profile.ollama.name
+  vpc_security_group_ids = [aws_security_group.ollama.id]
 
   root_block_device {
     volume_size = 50
@@ -128,6 +125,6 @@ resource "aws_eip" "ollama" {
 }
 
 resource "aws_eip_association" "ollama" {
-  instance_id   = aws_spot_instance_request.ollama.spot_instance_id
+  instance_id   = aws_instance.ollama.id
   allocation_id = aws_eip.ollama.id
 }
