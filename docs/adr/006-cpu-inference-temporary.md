@@ -1,6 +1,6 @@
 # ADR 006: GPU インスタンスの代わりに CPU インスタンスで推論（暫定）
 
-**Status**: Temporary (GPU クォータ承認後に ADR 005 の構成に戻す予定)  
+**Status**: Superseded (GPU クォータ承認により g4dn.xlarge に復帰)  
 **Date**: 2026-05
 
 ## Context
