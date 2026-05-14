@@ -27,6 +27,10 @@ output "invoice_s3_bucket" {
   value = aws_s3_bucket.invoice.bucket
 }
 
+output "ollama_instance_id" {
+  value = aws_instance.ollama.id
+}
+
 output "ollama_endpoint" {
   value = "http://${aws_eip.ollama.public_ip}:11434"
 }

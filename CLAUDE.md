@@ -63,7 +63,7 @@ terraform apply
 ## EC2へのアクセス（SSM）
 
 ```bash
-aws ssm start-session --target $(terraform output -raw spot_instance_id)
+aws ssm start-session --target $(terraform output -raw ollama_instance_id)
 ```
 
 SSH不要。ポート22は開放していない。
