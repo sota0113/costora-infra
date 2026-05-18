@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-DOMAIN="inference.patrae.net"
-EMAIL="admin@patrae.net"
+DOMAIN="inference.costora.net"
+EMAIL="admin@costora.net"
 
 certbot certonly \
   --dns-route53 \
@@ -15,15 +15,15 @@ certbot certonly \
 cat > /etc/nginx/conf.d/inference.conf << 'NGINXEOF'
 server {
     listen 80;
-    server_name inference.patrae.net;
+    server_name inference.costora.net;
     return 301 https://$$server_name$$request_uri;
 }
 
 server {
     listen 443 ssl;
-    server_name inference.patrae.net;
-    ssl_certificate     /etc/letsencrypt/live/inference.patrae.net/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/inference.patrae.net/privkey.pem;
+    server_name inference.costora.net;
+    ssl_certificate     /etc/letsencrypt/live/inference.costora.net/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/inference.costora.net/privkey.pem;
     client_max_body_size 50M;
 
     if ($$http_x_api_key != "${inference_api_key}") {
