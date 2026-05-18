@@ -2,6 +2,7 @@
 set -e
 
 # ── Ollama ───────────────────────────────────────────────────────────
+export HOME=/root
 curl -fsSL https://ollama.com/install.sh | sh
 systemctl enable ollama
 systemctl start ollama
@@ -50,7 +51,7 @@ systemctl start inference
 cat > /etc/nginx/conf.d/inference.conf << 'NGINXEOF'
 server {
     listen 80;
-    server_name inference.patrae.net;
+    server_name inference.costora.net;
     client_max_body_size 50M;
 
     if ($$http_x_api_key != "${inference_api_key}") {

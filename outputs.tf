@@ -36,12 +36,12 @@ output "ollama_endpoint" {
 }
 
 output "inference_endpoint" {
-  value = "https://inference.patrae.net"
+  value = "https://inference.costora.net"
 }
 
 output "route53_name_servers" {
-  description = "Set these 4 NS records in Squarespace to complete domain migration"
-  value       = aws_route53_zone.patrae.name_servers
+  description = "Set these 4 NS records in your domain registrar for costora.net"
+  value       = aws_route53_zone.costora.name_servers
 }
 
 output "inference_api_key" {
