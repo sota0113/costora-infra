@@ -54,14 +54,14 @@ server {
     server_name inference.costora.net;
     client_max_body_size 50M;
 
-    if ($$http_x_api_key != "${inference_api_key}") {
+    if ($http_x_api_key != "${inference_api_key}") {
         return 401;
     }
 
     location / {
         proxy_pass         http://127.0.0.1:8000;
-        proxy_set_header   Host $$host;
-        proxy_set_header   X-Real-IP $$remote_addr;
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
         proxy_read_timeout 600s;
     }
 }

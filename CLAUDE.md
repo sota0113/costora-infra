@@ -89,7 +89,7 @@ SSH不要。ポート22は開放していない。
 | `inference_api.py` | FastAPI アプリ本体 |
 | `setup_tls.sh` | Let's Encrypt TLS取得スクリプト（Terraformテンプレート） |
 
-`setup_tls.sh` と `userdata.sh` は Terraform `templatefile()` で処理されるため、nginx変数は `$$host` のように `$$` でエスケープしている。
+`setup_tls.sh` と `userdata.sh` は Terraform `templatefile()` で処理される。nginx変数（`$host` など）はそのまま記述してよい（`$` に `{` が続かない場合は Terraform がテンプレートとして解釈しない）。Terraform 変数は `${var_name}` 形式のみ展開される。
 
 ## 注意点
 
