@@ -6,9 +6,9 @@ import os
 from typing import Any
 
 import fitz  # PyMuPDF
+import jsonschema
 import requests
 from fastapi import FastAPI, File, HTTPException, UploadFile
-from jsonschema import Draft202012Validator
 
 app = FastAPI()
 
@@ -78,7 +78,6 @@ def call_ollama(prompt: str) -> dict[str, Any]:
 
 
 def extract_with_validation(text: str) -> dict[str, Any]:
-    validator = Draft202012Validator(INVOICE_SCHEMA)
     last_error: str | None = None
     last_raw: str | None = None
 
@@ -94,13 +93,12 @@ def extract_with_validation(text: str) -> dict[str, Any]:
         result = call_ollama(prompt)
         last_raw = json.dumps(result)
 
-        errors = sorted(validator.iter_errors(result), key=lambda e: e.path)
-        if not errors:
+        try:
+            jsonschema.validate(instance=result, schema=INVOICE_SCHEMA)
             return result
-        last_error = "; ".join(
-            f"{'/'.join(map(str, e.path)) or '<root>'}: {e.message}"
-            for e in errors
-        )
+        except jsonschema.ValidationError as e:
+            path = "/".join(map(str, e.path)) or "<root>"
+            last_error = f"{path}: {e.message}"
 
     raise ValueError(
         f"スキーマに合う JSON を生成できませんでした。最後のエラー: {last_error}"
