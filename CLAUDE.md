@@ -34,8 +34,8 @@ EC2 g4dn.xlarge オンデマンドインスタンス（NVIDIA T4 GPU）
 |---|---|
 | `aws_instance.ollama` | 推論サーバー (g4dn.xlarge、NVIDIA T4 GPU) |
 | `aws_eip.ollama` | 固定パブリックIP |
-| `aws_route53_zone.patrae` | patrae.net DNS管理 |
-| `aws_route53_record.inference` | inference.patrae.net → EIP |
+| `aws_route53_zone.costora` | costora.net DNS管理 |
+| `aws_route53_record.inference` | inference.costora.net → EIP |
 | `aws_dynamodb_table.keys` | APIキー管理 |
 | `aws_s3_bucket.invoice` | 請求書ファイル保存 |
 | `random_password.inference_api_key` | nginx APIキー（自動生成） |
@@ -53,7 +53,7 @@ terraform apply
 
 ## apply 後の手動ステップ
 
-1. **Squarespace NS変更**（初回のみ）
+1. **NS設定**（初回のみ）
    ```bash
    terraform output route53_name_servers
    ```
@@ -89,7 +89,7 @@ SSH不要。ポート22は開放していない。
 | `inference_api.py` | FastAPI アプリ本体 |
 | `setup_tls.sh` | Let's Encrypt TLS取得スクリプト（Terraformテンプレート） |
 
-`setup_tls.sh` と `userdata.sh` は Terraform `templatefile()` で処理されるため、nginx変数は `$$host` のように `$$` でエスケープしている。
+`setup_tls.sh` と `userdata.sh` は Terraform `templatefile()` で処理される。nginx変数（`$host` など）はそのまま記述してよい（`$` に `{` が続かない場合は Terraform がテンプレートとして解釈しない）。Terraform 変数は `${var_name}` 形式のみ展開される。
 
 ## 注意点
 
