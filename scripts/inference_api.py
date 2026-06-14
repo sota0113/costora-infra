@@ -6,9 +6,9 @@ import os
 from typing import Any
 
 import fitz  # PyMuPDF
-import jsonschema
 import requests
 from fastapi import FastAPI, File, HTTPException, UploadFile
+import jsonschema
 
 app = FastAPI()
 
@@ -27,8 +27,11 @@ INVOICE_SCHEMA: dict[str, Any] = {
                     "productName": {"type": "string"},
                     "subtotal": {"type": ["number", "null"]},
                     "expiryDate": {"type": ["string", "null"]},
+                    "currency": {"type": ["string", "null"]},
+                    "billingPeriodStart": {"type": ["string", "null"]},
+                    "billingPeriodEnd": {"type": ["string", "null"]},
                 },
-                "required": ["productName", "subtotal", "expiryDate"],
+                "required": ["productName", "subtotal", "expiryDate", "currency", "billingPeriodStart", "billingPeriodEnd"],
             },
         }
     },
