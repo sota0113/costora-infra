@@ -3,7 +3,7 @@ from __future__ import annotations
 import io
 import json
 import os
-from typing import Any
+from typing import Any, Optional
 
 import fitz  # PyMuPDF
 import jsonschema
@@ -20,11 +20,11 @@ MAX_CHARS = 12_000
 
 class ParsedField(BaseModel):
     productName: str
-    subtotal: float | None = None
-    expiryDate: str | None = None
-    currency: str | None = None
-    billingPeriodStart: str | None = None
-    billingPeriodEnd: str | None = None
+    subtotal: Optional[float] = None
+    expiryDate: Optional[str] = None
+    currency: Optional[str] = None
+    billingPeriodStart: Optional[str] = None
+    billingPeriodEnd: Optional[str] = None
 
 
 class ParseResponse(BaseModel):
