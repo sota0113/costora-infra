@@ -49,3 +49,14 @@ output "inference_api_key" {
   value       = random_password.inference_api_key.result
   sensitive   = true
 }
+
+output "ses_webhook_secret" {
+  description = "Set as SES_WEBHOOK_SECRET in Vercel environment variables"
+  value       = random_password.ses_webhook_secret.result
+  sensitive   = true
+}
+
+output "ses_invoice_email_domain" {
+  description = "SES受信用メールドメイン。invoice-{itemId}@<このドメイン> に転送"
+  value       = "mail.costora.net"
+}

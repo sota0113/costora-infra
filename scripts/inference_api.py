@@ -3,18 +3,33 @@ from __future__ import annotations
 import io
 import json
 import os
-from typing import Any
+from typing import Any, Optional
 
 import fitz  # PyMuPDF
+import jsonschema
 import requests
 from fastapi import FastAPI, File, HTTPException, UploadFile
-import jsonschema
+from pydantic import BaseModel
 
 app = FastAPI()
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1:8b")
 MAX_CHARS = 12_000
+
+
+class ParsedField(BaseModel):
+    productName: str
+    subtotal: Optional[float] = None
+    expiryDate: Optional[str] = None
+    currency: Optional[str] = None
+    billingPeriodStart: Optional[str] = None
+    billingPeriodEnd: Optional[str] = None
+
+
+class ParseResponse(BaseModel):
+    fields: list[ParsedField]
+
 
 INVOICE_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -27,8 +42,11 @@ INVOICE_SCHEMA: dict[str, Any] = {
                     "productName": {"type": "string"},
                     "subtotal": {"type": ["number", "null"]},
                     "expiryDate": {"type": ["string", "null"]},
+                    "currency": {"type": ["string", "null"]},
+                    "billingPeriodStart": {"type": ["string", "null"]},
+                    "billingPeriodEnd": {"type": ["string", "null"]},
                 },
-                "required": ["productName", "subtotal", "expiryDate"],
+                "required": ["productName", "subtotal", "expiryDate", "currency", "billingPeriodStart", "billingPeriodEnd"],
             },
         }
     },
@@ -40,6 +58,14 @@ def build_prompt(text: str) -> str:
     schema_str = json.dumps(INVOICE_SCHEMA, ensure_ascii=False, indent=2)
     return f"""あなたは厳密な情報抽出アシスタントです。
 以下のドキュメントから、指定された JSON Schema に従って情報を抽出してください。
+
+# 抽出するフィールド
+- productName: 商品・サービス名
+- subtotal: 小計金額（税抜き金額。税込合計ではなく小計を抽出）
+- expiryDate: 契約・ライセンスの有効期限（YYYY-MM-DD形式、なければnull）
+- currency: 通貨コード（JPY, USD, EURなど。請求書の通貨記号から判断）
+- billingPeriodStart: 請求期間の開始日（YYYY-MM-DD形式、なければnull）
+- billingPeriodEnd: 請求期間の終了日（YYYY-MM-DD形式、なければnull）
 
 # ルール
 - 出力は **JSON のみ**。説明文・前置き・コードブロック記号は禁止。
@@ -97,15 +123,16 @@ def extract_with_validation(text: str) -> dict[str, Any]:
             jsonschema.validate(instance=result, schema=INVOICE_SCHEMA)
             return result
         except jsonschema.ValidationError as e:
-            last_error = f"{'/'.join(map(str, e.path)) or '<root>'}: {e.message}"
+            path = "/".join(map(str, e.path)) or "<root>"
+            last_error = f"{path}: {e.message}"
 
     raise ValueError(
         f"スキーマに合う JSON を生成できませんでした。最後のエラー: {last_error}"
     )
 
 
-@app.post("/parse")
-async def parse_invoice(file: UploadFile = File(...)) -> dict[str, Any]:
+@app.post("/parse", response_model=ParseResponse)
+async def parse_invoice(file: UploadFile = File(...)) -> ParseResponse:
     content = await file.read()
     filename = (file.filename or "").lower()
 
@@ -140,7 +167,8 @@ async def parse_invoice(file: UploadFile = File(...)) -> dict[str, Any]:
         if len(text) > MAX_CHARS:
             text = text[:MAX_CHARS]
 
-        return extract_with_validation(text)
+        raw = extract_with_validation(text)
+        return ParseResponse(fields=[ParsedField(**f) for f in raw.get("fields", [])])
 
     except HTTPException:
         raise
