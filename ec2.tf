@@ -123,8 +123,10 @@ resource "aws_instance" "ollama" {
     inference_api_b64 = base64encode(file("${path.module}/scripts/inference_api.py"))
     setup_tls_b64 = base64encode(templatefile("${path.module}/scripts/setup_tls.sh", {
       inference_api_key = random_password.inference_api_key.result
+      inference_domain  = var.inference_domain
     }))
     inference_api_key = random_password.inference_api_key.result
+    inference_domain  = var.inference_domain
   })
 
   tags = {
