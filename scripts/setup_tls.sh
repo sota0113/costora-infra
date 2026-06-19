@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-DOMAIN="inference.costora.net"
+DOMAIN="${inference_domain}"
 EMAIL="admin@costora.net"
 
 certbot certonly \
@@ -15,15 +15,15 @@ certbot certonly \
 cat > /etc/nginx/conf.d/inference.conf << 'NGINXEOF'
 server {
     listen 80;
-    server_name inference.costora.net;
+    server_name ${inference_domain};
     return 301 https://$server_name$request_uri;
 }
 
 server {
     listen 443 ssl;
-    server_name inference.costora.net;
-    ssl_certificate     /etc/letsencrypt/live/inference.costora.net/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/inference.costora.net/privkey.pem;
+    server_name ${inference_domain};
+    ssl_certificate     /etc/letsencrypt/live/${inference_domain}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${inference_domain}/privkey.pem;
     client_max_body_size 50M;
 
     if ($http_x_api_key != "${inference_api_key}") {
