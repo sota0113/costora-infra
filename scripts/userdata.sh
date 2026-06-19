@@ -1,21 +1,13 @@
 #!/bin/bash
 set -e
 
-# ── Ollama ───────────────────────────────────────────────────────────
-export HOME=/root
-curl -fsSL https://ollama.com/install.sh | sh
-systemctl enable ollama
-systemctl start ollama
-sleep 15
-ollama pull llama3.1:8b
-
 # ── Python deps ──────────────────────────────────────────────────────
 dnf install -y python3-pip nginx
 pip3 install \
   fastapi \
   "uvicorn[standard]" \
   pymupdf \
-  requests \
+  boto3 \
   jsonschema \
   python-multipart \
   openpyxl \
@@ -32,13 +24,14 @@ B64EOF
 cat > /etc/systemd/system/inference.service << 'UNIT'
 [Unit]
 Description=Inference FastAPI Server
-After=network.target ollama.service
+After=network.target
 
 [Service]
 ExecStart=/usr/local/bin/uvicorn main:app --host 127.0.0.1 --port 8000
 WorkingDirectory=/opt/inference
 Restart=always
-Environment=OLLAMA_HOST=http://localhost:11434
+Environment=BEDROCK_MODEL_ID=us.anthropic.claude-haiku-4-5-20251001-v1:0
+Environment=BEDROCK_REGION=us-east-1
 
 [Install]
 WantedBy=multi-user.target

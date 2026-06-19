@@ -1,6 +1,6 @@
 # ADR 006: GPU インスタンスの代わりに CPU インスタンスで推論（暫定）
 
-**Status**: Superseded (GPU クォータ承認により g4dn.xlarge に復帰)  
+**Status**: Superseded by [ADR 008](008-bedrock-migration.md)  
 **Date**: 2026-05
 
 ## Context
