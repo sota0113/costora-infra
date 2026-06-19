@@ -31,10 +31,6 @@ output "ollama_instance_id" {
   value = aws_instance.ollama.id
 }
 
-output "ollama_endpoint" {
-  value = "http://${aws_eip.ollama.public_ip}:11434"
-}
-
 output "inference_endpoint" {
   value = "https://inference.costora.net"
 }

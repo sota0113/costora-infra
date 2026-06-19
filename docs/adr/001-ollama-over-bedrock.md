@@ -1,6 +1,6 @@
 # ADR 001: Amazon Bedrock の代わりに Ollama をセルフホスト
 
-**Status**: Adopted  
+**Status**: Superseded by [ADR 008](008-bedrock-migration.md)  
 **Date**: 2026-05
 
 ## Context

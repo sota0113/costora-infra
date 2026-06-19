@@ -1,10 +1,10 @@
-data "aws_ami" "deep_learning" {
+data "aws_ami" "amazon_linux_2023" {
   most_recent = true
   owners      = ["amazon"]
 
   filter {
     name   = "name"
-    values = ["Deep Learning OSS Nvidia Driver AMI GPU * (Amazon Linux 2023) *"]
+    values = ["al2023-ami-*-x86_64"]
   }
 
   filter {
@@ -54,6 +54,23 @@ resource "aws_iam_role_policy" "ollama_route53" {
   })
 }
 
+resource "aws_iam_role_policy" "ollama_bedrock" {
+  name = "${var.project}-ollama-bedrock"
+  role = aws_iam_role.ollama.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = ["bedrock:InvokeModel"]
+      Resource = [
+        "arn:aws:bedrock:us-east-1::foundation-model/*",
+        "arn:aws:bedrock:us-east-1:*:inference-profile/*",
+      ]
+    }]
+  })
+}
+
 resource "aws_iam_instance_profile" "ollama" {
   name = "${var.project}-ollama"
   role = aws_iam_role.ollama.name
@@ -61,7 +78,7 @@ resource "aws_iam_instance_profile" "ollama" {
 
 resource "aws_security_group" "ollama" {
   name        = "${var.project}-ollama"
-  description = "Ollama inference server"
+  description = "Inference server"
 
   ingress {
     description = "HTTP"
@@ -92,13 +109,13 @@ resource "aws_security_group" "ollama" {
 }
 
 resource "aws_instance" "ollama" {
-  ami                    = data.aws_ami.deep_learning.id
-  instance_type          = "g4dn.xlarge"
+  ami                    = data.aws_ami.amazon_linux_2023.id
+  instance_type          = "t3.small"
   iam_instance_profile   = aws_iam_instance_profile.ollama.name
   vpc_security_group_ids = [aws_security_group.ollama.id]
 
   root_block_device {
-    volume_size = 50
+    volume_size = 20
     volume_type = "gp3"
   }
 

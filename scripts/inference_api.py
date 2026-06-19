@@ -5,17 +5,19 @@ import json
 import os
 from typing import Any, Optional
 
+import boto3
 import fitz  # PyMuPDF
 import jsonschema
-import requests
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel
 
 app = FastAPI()
 
-OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
-MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1:8b")
+MODEL_ID = os.environ.get("BEDROCK_MODEL_ID", "us.anthropic.claude-haiku-4-5-20251001-v1:0")
+BEDROCK_REGION = os.environ.get("BEDROCK_REGION", "us-east-1")
 MAX_CHARS = 12_000
+
+_bedrock = boto3.client("bedrock-runtime", region_name=BEDROCK_REGION)
 
 
 class ParsedField(BaseModel):
@@ -83,23 +85,29 @@ def build_prompt(text: str) -> str:
 """
 
 
-def call_ollama(prompt: str) -> dict[str, Any]:
-    payload = {
-        "model": MODEL,
-        "prompt": prompt,
-        "stream": False,
-        "format": "json",
-        "options": {"temperature": 0.0, "num_ctx": 8192},
+def call_bedrock(prompt: str) -> dict[str, Any]:
+    body = {
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 4096,
+        "temperature": 0.0,
+        "messages": [{"role": "user", "content": prompt}],
     }
     try:
-        resp = requests.post(
-            f"{OLLAMA_HOST}/api/generate", json=payload, timeout=600
+        response = _bedrock.invoke_model(
+            modelId=MODEL_ID,
+            contentType="application/json",
+            accept="application/json",
+            body=json.dumps(body),
         )
-        resp.raise_for_status()
-    except requests.RequestException as e:
-        raise RuntimeError(f"Ollama API error: {e}") from e
+    except Exception as e:
+        raise RuntimeError(f"Bedrock API error: {e}") from e
 
-    raw = resp.json().get("response", "").strip()
+    result = json.loads(response["body"].read())
+    raw = result["content"][0]["text"].strip()
+    # Claude がコードフェンスで囲んだ場合に備えて除去
+    if raw.startswith("```"):
+        parts = raw.split("```")
+        raw = parts[1].lstrip("json").strip()
     return json.loads(raw)
 
 
@@ -116,7 +124,7 @@ def extract_with_validation(text: str) -> dict[str, Any]:
                 "上記を修正して、有効な JSON のみを返してください。\n"
             )
 
-        result = call_ollama(prompt)
+        result = call_bedrock(prompt)
         last_raw = json.dumps(result)
 
         try:
@@ -156,11 +164,6 @@ async def parse_invoice(file: UploadFile = File(...)) -> ParseResponse:
             import mammoth
             result = mammoth.extract_raw_text(io.BytesIO(content))
             text = result.value
-        elif filename.endswith((".jpg", ".jpeg", ".png", ".webp")):
-            raise HTTPException(
-                status_code=400,
-                detail="画像ファイルは現在未対応です（テキスト専用モデル使用中）",
-            )
         else:
             text = content.decode("utf-8", errors="replace")
 
