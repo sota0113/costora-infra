@@ -27,7 +27,7 @@ Vercel (Next.js)
     ↓ HTTPS / X-Api-Key ヘッダー
 inference.costora.net (Route53 A → EIP)
     ↓
-EC2 t3.small オンデマンドインスタンス（Amazon Linux 2023）
+EC2 t3.medium オンデマンドインスタンス（Amazon Linux 2023）
     ├── nginx :443        ← TLS終端 + APIキー認証
     └── FastAPI :8000     ← PDF解析 + Bedrock呼び出し
                                     ↓ HTTPS (インターネット経由)
@@ -39,7 +39,7 @@ EC2 t3.small オンデマンドインスタンス（Amazon Linux 2023）
 
 | リソース | 用途 |
 |---|---|
-| `aws_instance.ollama` | 推論サーバー (t3.small、nginx + FastAPI) |
+| `aws_instance.ollama` | 推論サーバー (t3.medium、nginx + FastAPI) |
 | `aws_eip.ollama` | 固定パブリックIP |
 | `aws_route53_zone.costora` | costora.net DNS管理 |
 | `aws_route53_record.inference` | inference.costora.net → EIP |

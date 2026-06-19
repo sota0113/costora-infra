@@ -64,8 +64,8 @@ resource "aws_iam_role_policy" "ollama_bedrock" {
       Effect = "Allow"
       Action = ["bedrock:InvokeModel"]
       Resource = [
-        "arn:aws:bedrock:us-east-1::foundation-model/*",
-        "arn:aws:bedrock:us-east-1:*:inference-profile/*",
+        "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0",
+        "arn:aws:bedrock:us-east-1:*:inference-profile/us.anthropic.claude-haiku-4-5-20251001-v1:0",
       ]
     }]
   })
@@ -110,7 +110,7 @@ resource "aws_security_group" "ollama" {
 
 resource "aws_instance" "ollama" {
   ami                    = data.aws_ami.amazon_linux_2023.id
-  instance_type          = "t3.small"
+  instance_type          = "t3.medium"
   iam_instance_profile   = aws_iam_instance_profile.ollama.name
   vpc_security_group_ids = [aws_security_group.ollama.id]
 
