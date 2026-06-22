@@ -2,7 +2,7 @@
 set -e
 
 # ── Python deps ──────────────────────────────────────────────────────
-dnf install -y python3-pip nginx
+dnf install -y python3-pip nginx cronie
 pip3 install \
   fastapi \
   "uvicorn[standard]" \
@@ -62,6 +62,8 @@ NGINXEOF
 
 systemctl enable nginx
 systemctl start nginx
+systemctl enable crond
+systemctl start crond
 
 # ── TLS setup script ─────────────────────────────────────────────────
 base64 -d > /opt/setup-tls.sh << 'B64EOF'
