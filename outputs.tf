@@ -32,7 +32,7 @@ output "ollama_instance_id" {
 }
 
 output "inference_endpoint" {
-  value = "https://${var.inference_domain}"
+  value = "https://inference.costora.net"
 }
 
 output "route53_name_servers" {

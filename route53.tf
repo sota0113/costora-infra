@@ -13,15 +13,3 @@ resource "aws_route53_record" "inference" {
   ttl     = 300
   records = [aws_eip.ollama.public_ip]
 }
-
-data "aws_route53_zone" "patrae" {
-  name = "patrae.net"
-}
-
-resource "aws_route53_record" "inference_patrae" {
-  zone_id = data.aws_route53_zone.patrae.zone_id
-  name    = "inference.patrae.net"
-  type    = "A"
-  ttl     = 300
-  records = [aws_eip.ollama.public_ip]
-}

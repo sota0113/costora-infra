@@ -11,8 +11,3 @@ variable "vercel_webhook_url" {
   default     = "https://costora.vercel.app/api/webhook/ses-invoice"
 }
 
-variable "inference_domain" {
-  description = "推論サーバーのドメイン名（costora.net DNS解決後は inference.costora.net に戻す）"
-  default     = "inference.patrae.net"
-}
-

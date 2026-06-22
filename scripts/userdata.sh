@@ -44,7 +44,7 @@ systemctl start inference
 cat > /etc/nginx/conf.d/inference.conf << 'NGINXEOF'
 server {
     listen 80;
-    server_name ${inference_domain};
+    server_name inference.costora.net;
     client_max_body_size 50M;
 
     if ($http_x_api_key != "${inference_api_key}") {
