@@ -6,7 +6,6 @@ EMAIL="admin@costora.net"
 
 certbot certonly \
   --dns-route53 \
-  --dns-route53-propagation-seconds 60 \
   -d "$DOMAIN" \
   --non-interactive \
   --agree-tos \
