@@ -63,8 +63,12 @@ resource "aws_iam_role_policy" "ollama_bedrock" {
     Statement = [{
       Effect = "Allow"
       Action = ["bedrock:InvokeModel"]
+      # us. 推論プロファイルは us-east-1 / us-east-2 / us-west-2 へクロスリージョン
+      # ルーティングするため、3リージョン分の foundation-model を許可する必要がある
       Resource = [
         "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0",
+        "arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0",
+        "arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0",
         "arn:aws:bedrock:us-east-1:*:inference-profile/us.anthropic.claude-haiku-4-5-20251001-v1:0",
       ]
     }]
