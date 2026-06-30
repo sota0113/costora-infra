@@ -114,7 +114,7 @@ resource "aws_security_group" "ollama" {
 
 resource "aws_instance" "ollama" {
   ami                    = data.aws_ami.amazon_linux_2023.id
-  instance_type          = "t3.medium"
+  instance_type          = "t3.micro"
   iam_instance_profile   = aws_iam_instance_profile.ollama.name
   vpc_security_group_ids = [aws_security_group.ollama.id]
 
